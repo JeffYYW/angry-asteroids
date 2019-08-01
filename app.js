@@ -86,6 +86,13 @@ function draw() {
                 laneOne.shift()
                 i--
             }
+            // rectangle vs rectangle collision
+            if (laneOne[i].x < cX + car.width &&
+                laneOne[i].x + carRed.width > cX &&
+                laneOne[i].y < cY + car.height &&
+                laneOne[i].y + carRed.height > cY) {
+                alert('collision!')
+            }
         }
 
         for (let j = 0; j < laneTwo.length; j++) {
@@ -112,8 +119,9 @@ function draw() {
 }
 
 car.onload = () => {
-    // draw();
+    draw();
 }
 
 
-
+// https://www.youtube.com/watch?v=1oNsZCqQDeE
+// https://www.youtube.com/watch?v=L07i4g-zhDA
