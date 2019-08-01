@@ -13,44 +13,38 @@ car.src = "./assets/car-small.png";
 carRed.src = "./assets/car-red-small.png";
 bg.src = "./assets/roadBackground.jpg";
 
-// carRed.onload = () => {
-//     ctx.drawImage(carRed, 400, 100)
-// }
-
-// car.onload = () => {
-//     ctx.drawImage(car, cX, cY)
-// }
-
 let cX = 600;
 let cY = 450;
 
-// left
-document.addEventListener("keydown", event => {
+// velX = 0;
+// velY = 0;
+// maxSpeed = 10;
+
+document.addEventListener("keydown", moveCar)
+
+function moveCar(event) {
+    // move left if cX is not too near the left side of the canvas
     if (event.keyCode === 37 && cX > 10) {
         cX -= 20;
+        // velX -= 1;
     }
-});
-
-// right
-document.addEventListener("keydown", event => {
+    // move right if the left side of the car is not too near the right of the canvas
     if (event.keyCode === 39 && cX < cvs.width - 150) {
         cX += 20;
+        // velX += 1;
     }
-});
-
-// up
-document.addEventListener("keydown", event => {
+    // move up if cY is not too near the top of the canvas 
     if (event.keyCode === 38 && cY > 10) {
         cY -= 20;
+        // velY -= 1;
     }
-});
-
-// down
-document.addEventListener("keydown", event => {
+    // move down if the car's cY point + its height (bottom of car) is not too near the bottom of the canvas 
     if (event.keyCode === 40 && cY < cvs.height - 255) {
         cY += 20;
+        // velY += 1;
     }
-});
+}
+    
 
 
 
@@ -82,16 +76,17 @@ function draw() {
                     y: 0 - car.height
                 })
             }
-            if (laneOne[i].y === canvas.height) {
-                laneOne.shift()
-                i--
-            }
             // rectangle vs rectangle collision
-            if (laneOne[i].x < cX + car.width &&
-                laneOne[i].x + carRed.width > cX &&
+            if (laneOne[i].x + 10 < cX + car.width &&
+                laneOne[i].x + carRed.width - 10 > cX &&
                 laneOne[i].y < cY + car.height &&
                 laneOne[i].y + carRed.height > cY) {
                 alert('collision!')
+            }
+            // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
+            if (laneOne[i].y === canvas.height) {
+                laneOne.shift()
+                i--
             }
         }
 
@@ -112,12 +107,16 @@ function draw() {
             }
         }
 
+        // cX += velX;
+        // cY += velY;
+
         ctx.drawImage(car, cX, cY)
 
     requestAnimationFrame(draw);
 
 }
 
+// wait for images to load before drawing
 car.onload = () => {
     draw();
 }
