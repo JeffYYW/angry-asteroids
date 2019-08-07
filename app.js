@@ -84,33 +84,54 @@ function setBounds() {
     }
 }
 
-const laneOne = [];
+// const laneOne = [];
 
-laneOne[0] = {
-    x : 500,
-    y : 0
-}
+// laneOne[0] = {
+//     x : 500,
+//     y : 0
+// }
 
-const laneTwo = [];
+// const laneTwo = [];
 
-laneTwo[0] = {
-    x: 250,
-    y: 50
-}
+// laneTwo[0] = {
+//     x: 250,
+//     y: 50
+// }
 
-const lineArray = [];
+// const lineArray = [];
 
-lineArray[0] = {
-     x: 230,
-     y: 0
-};
+// lineArray[0] = {
+//      x: 230,
+//      y: 0
+// };
 
 
 // test randomizing cars
 const carType = [carGrey, carRed, carFord, carMercedes, carBlack]
 let randomCar = 0
 
-redCarX = 300
+const lanes = [
+    {
+        carType: carRed,
+        laneX: 150,
+        laneY: 0,
+        velocityY: 0
+    },
+    {
+        carType: carFord,
+        laneX: 500,
+        laneY: 0,
+        velocityY: 0
+    },
+    {
+        carType: carMercedes,
+        laneX: 650,
+        laneY: 0,
+        velocityY: 0
+    }
+]
+
+redCarX = 150
 redCarY = 0
 
 velRedY = 0
@@ -123,27 +144,8 @@ bgVelY = 0
 
 function draw() {
         
-        // ctx.drawImage(bg,0,0);
 
-        // for (let a = 0; a < lineArray.length; a++) {
-        //     // console.log(a)
-        //     ctx.drawImage(whiteLine, lineArray[a].x, lineArray[a].y)
-        //     lineArray[a].y = lineArray[a].y + 2;
-        //     if (lineArray[a].y === canvas.height - canvas.height / 2) {
-        //         lineArray.push({
-        //             x: 230,
-        //             y: -whiteLine.height
-        //         })
-        //     }
-
-        //     if (lineArray[a].y > canvas.height) {
-        //         lineArray.shift()
-        //         a--
-        //     }
-        // }
-
-        
-        
+        // have two bg images scrolling one after the other
         console.log(bgY)
         ctx.drawImage(bg, bgX, bgY);
         ctx.drawImage(bg, bgX, bgY2);
@@ -166,73 +168,85 @@ function draw() {
         document.addEventListener("keyup", keyListener)
         moveCar()
 
-        for (let i = 0; i < laneOne.length; i++) {
-            // console.log(i)
-            ctx.drawImage(carType[randomCar], laneOne[i].x, laneOne[i].y)
-            laneOne[i].y++;
-            if (laneOne[i].y === canvas.height - 360) {
-                laneOne.push({
-                    x: 500,
-                    // test randomizing cars. original was 0 - car.height
-                    y: -500 - car.height
-                })
-            }
-            // rectangle vs rectangle collision
-            if (laneOne[i].x + 25 < cX + car.width &&
-                laneOne[i].x + carRed.width - 25 > cX &&
-                laneOne[i].y + 10 < cY + car.height &&
-                laneOne[i].y + carRed.height -10 > cY) {
-                alert('collision!')
-            }
-            // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
-            if (laneOne[i].y === canvas.height) {
-                laneOne.shift()
-                i--
-                // test randomizing cars
-                
-                randomCar = randomNumber(0, 4)
-            }
-        }
-
-        // must use length in the loop since it iterates to a number too fast. 
-        // for (let j = 0; j < laneTwo.length; j++) {
-        //     console.log(j)
-        //     ctx.drawImage(carRed, laneTwo[j].x, laneTwo[j].y)
-        //     laneTwo[j].y = laneTwo[j].y + 2;
-        //     if (laneTwo[j].y === canvas.height - 300) {
-        //         laneTwo.push({
-        //             x: randomNumber(300, 350),
-        //             y: -750
+        // for (let i = 0; i < laneOne.length; i++) {
+        //     // console.log(i)
+        //     ctx.drawImage(carType[randomCar], laneOne[i].x, laneOne[i].y)
+        //     laneOne[i].y++;
+        //     if (laneOne[i].y === canvas.height - 360) {
+        //         laneOne.push({
+        //             x: 500,
+        //             // test randomizing cars. original was 0 - car.height
+        //             y: -500 - car.height
         //         })
         //     }
-
-        //     if (laneTwo[j].y > canvas.height) {
-        //         laneTwo.shift()
-        //         j--
+        //     // rectangle vs rectangle collision
+        //     if (laneOne[i].x + 25 < cX + car.width &&
+        //         laneOne[i].x + carRed.width - 25 > cX &&
+        //         laneOne[i].y + 10 < cY + car.height &&
+        //         laneOne[i].y + carRed.height -10 > cY) {
+        //         alert('collision!')
+        //     }
+        //     // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
+        //     if (laneOne[i].y === canvas.height) {
+        //         laneOne.shift()
+        //         i--
+        //         // test randomizing cars
+                
+        //         randomCar = randomNumber(0, 4)
         //     }
         // }
 
 
         // -------------------------------------------------
-        const randoVel = randomNumber(0.7, 0.9)
-        redCarY += velRedY
-        velRedY++
-        velRedY *= randoVel;
 
-        const rando = randomNumber(300, 500)
+        const laneTraffic = (lane) => {
+            const randomVelocity = randomNumber(0.7, 0.99)
+            lanes[lane].laneY += lanes[lane].velocityY;
+            lanes[lane].velocityY++;
+            lanes[lane].velocityY *= randomVelocity;
 
-        if (redCarY > canvas.height) {
-            redCarY = -rando
+            
+            
+            if (lanes[lane].laneX + 25 < cX + car.width &&
+                lanes[lane].laneX + lanes[lane].carType.width - 25 > cX &&
+                lanes[lane].laneY + 10 < cY + car.height &&
+                lanes[lane].laneY + lanes[lane].carType.height - 10 > cY) {
+                alert('collision!')
+            }
+
+            const randomHeight = randomNumber(100, 200)
+            
+            if (lanes[lane].laneY > canvas.height) {
+                lanes[lane].laneY = -lanes[lane].carType.height - randomHeight
+                // lanes[lane].laneY = 0
+                randomCar = randomNumber(0, 4)
+                lanes[lane].carType = carType[randomCar]
+            }
+            
+            ctx.drawImage(lanes[lane].carType, lanes[lane].laneX, lanes[lane].laneY)
         }
 
-        if (redCarX + 25 < cX + car.width &&
-            redCarX + carRed.width - 25 > cX &&
-            redCarY + 10 < cY + car.height &&
-            redCarY + carRed.height - 10 > cY) {
-            alert('collision!')
-        }
+        laneTraffic('0')
+
+        // const randoVel = randomNumber(0.7, 0.9)
+        // redCarY += velRedY
+        // velRedY++
+        // velRedY *= randoVel;
+
+        // const rando = randomNumber(100, 150)
+
+        // if (redCarY > canvas.height) {
+        //     redCarY = -carRed.height - rando
+        // }
+
+        // if (redCarX + 25 < cX + car.width &&
+        //     redCarX + carRed.width - 25 > cX &&
+        //     redCarY + 10 < cY + car.height &&
+        //     redCarY + carRed.height - 10 > cY) {
+        //     alert('collision!')
+        // }
         
-        ctx.drawImage(carRed, redCarX, redCarY)
+        // ctx.drawImage(carRed, redCarX, redCarY)
         // -----------------------------------------------------
         
 
@@ -263,7 +277,8 @@ car.onload = () => {
 // add timer (get to work on time)
 // touch screen functionality
 
-
+// http://atomicrobotdesign.com/blog/htmlcss/build-a-vertical-scrolling-shooter-game-with-html5-canvas-part-6/
+    // scrolling bg
 // https://www.youtube.com/watch?v=8uIt9a2XBrw&t=368s
 // https://www.youtube.com/watch?v=1oNsZCqQDeE
 // https://www.youtube.com/watch?v=L07i4g-zhDA
@@ -297,3 +312,21 @@ car.onload = () => {
 //         // velY += 1;
 //     }
 // }
+
+// must use length in the loop since it iterates to a number too fast. 
+        // for (let j = 0; j < laneTwo.length; j++) {
+        //     console.log(j)
+        //     ctx.drawImage(carRed, laneTwo[j].x, laneTwo[j].y)
+        //     laneTwo[j].y = laneTwo[j].y + 2;
+        //     if (laneTwo[j].y === canvas.height - 300) {
+        //         laneTwo.push({
+        //             x: randomNumber(300, 350),
+        //             y: -750
+        //         })
+        //     }
+
+        //     if (laneTwo[j].y > canvas.height) {
+        //         laneTwo.shift()
+        //         j--
+        //     }
+        // }
