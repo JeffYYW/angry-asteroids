@@ -7,11 +7,21 @@ const ctx = cvs.getContext("2d");
 
 const car = new Image();
 const carRed = new Image();
+const carGrey = new Image();
+const carMercedes = new Image();
+const carFord = new Image();
+const carBlack = new Image();
 const bg = new Image();
+const whiteLine = new Image();
 
-car.src = "./assets/car-small.png";
+whiteLine.src = "./assets/white-line.jpg"
+car.src = "./assets/honda.png";
+carGrey.src = "./assets/car-small.png";
 carRed.src = "./assets/car-red-small.png";
-bg.src = "./assets/roadBackground.jpg";
+carMercedes.src = "./assets/mercedes.png";
+carFord.src = "./assets/ford.png";
+carBlack.src = "./assets/black-car.png";
+bg.src = "./assets/blackRoad.jpg";
 
 let cX = 600;
 let cY = 450;
@@ -58,8 +68,210 @@ function moveCar() {
     }
 }
 
+function randomNumber(min, max) {
+    let num = Math.floor(Math.random() * (max - min)) + min;
+    return num;
+}
+
+function setBounds() {
+    if (cX <= 10) {
+        cX = 10
+        velX = 0;
+    }
+    if (cX + car.width >= cvs.width) {
+        cX = cvs.width - car.width;
+        velX = 0;
+    }
+}
+
+const laneOne = [];
+
+laneOne[0] = {
+    x : 500,
+    y : 0
+}
+
+const laneTwo = [];
+
+laneTwo[0] = {
+    x: 250,
+    y: 50
+}
+
+const lineArray = [];
+
+lineArray[0] = {
+     x: 230,
+     y: 0
+};
 
 
+// test randomizing cars
+const carType = [carGrey, carRed, carFord, carMercedes, carBlack]
+let randomCar = 0
+
+redCarX = 300
+redCarY = 0
+
+velRedY = 0
+
+bgX = 0
+bgY = 0
+bgY2 = -1250
+
+bgVelY = 0
+
+function draw() {
+        
+        // ctx.drawImage(bg,0,0);
+
+        // for (let a = 0; a < lineArray.length; a++) {
+        //     // console.log(a)
+        //     ctx.drawImage(whiteLine, lineArray[a].x, lineArray[a].y)
+        //     lineArray[a].y = lineArray[a].y + 2;
+        //     if (lineArray[a].y === canvas.height - canvas.height / 2) {
+        //         lineArray.push({
+        //             x: 230,
+        //             y: -whiteLine.height
+        //         })
+        //     }
+
+        //     if (lineArray[a].y > canvas.height) {
+        //         lineArray.shift()
+        //         a--
+        //     }
+        // }
+
+        
+        
+        console.log(bgY)
+        ctx.drawImage(bg, bgX, bgY);
+        ctx.drawImage(bg, bgX, bgY2);
+        if (bgY > canvas.height) {
+            bgY = -1250;
+        }
+        if (bgY2 > canvas.height) {
+            bgY2 = -1250;
+        }
+        bgY += bgVelY
+        bgY2 +=bgVelY
+        bgVelY++
+        bgVelY *= 0.9;
+
+
+        // -----------------------------------------------------------------
+        setBounds()
+
+        document.addEventListener("keydown", keyListener)
+        document.addEventListener("keyup", keyListener)
+        moveCar()
+
+        for (let i = 0; i < laneOne.length; i++) {
+            // console.log(i)
+            ctx.drawImage(carType[randomCar], laneOne[i].x, laneOne[i].y)
+            laneOne[i].y++;
+            if (laneOne[i].y === canvas.height - 360) {
+                laneOne.push({
+                    x: 500,
+                    // test randomizing cars. original was 0 - car.height
+                    y: -500 - car.height
+                })
+            }
+            // rectangle vs rectangle collision
+            if (laneOne[i].x + 25 < cX + car.width &&
+                laneOne[i].x + carRed.width - 25 > cX &&
+                laneOne[i].y + 10 < cY + car.height &&
+                laneOne[i].y + carRed.height -10 > cY) {
+                alert('collision!')
+            }
+            // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
+            if (laneOne[i].y === canvas.height) {
+                laneOne.shift()
+                i--
+                // test randomizing cars
+                
+                randomCar = randomNumber(0, 4)
+            }
+        }
+
+        // must use length in the loop since it iterates to a number too fast. 
+        // for (let j = 0; j < laneTwo.length; j++) {
+        //     console.log(j)
+        //     ctx.drawImage(carRed, laneTwo[j].x, laneTwo[j].y)
+        //     laneTwo[j].y = laneTwo[j].y + 2;
+        //     if (laneTwo[j].y === canvas.height - 300) {
+        //         laneTwo.push({
+        //             x: randomNumber(300, 350),
+        //             y: -750
+        //         })
+        //     }
+
+        //     if (laneTwo[j].y > canvas.height) {
+        //         laneTwo.shift()
+        //         j--
+        //     }
+        // }
+
+
+        // -------------------------------------------------
+        const randoVel = randomNumber(0.7, 0.9)
+        redCarY += velRedY
+        velRedY++
+        velRedY *= randoVel;
+
+        const rando = randomNumber(300, 500)
+
+        if (redCarY > canvas.height) {
+            redCarY = -rando
+        }
+
+        if (redCarX + 25 < cX + car.width &&
+            redCarX + carRed.width - 25 > cX &&
+            redCarY + 10 < cY + car.height &&
+            redCarY + carRed.height - 10 > cY) {
+            alert('collision!')
+        }
+        
+        ctx.drawImage(carRed, redCarX, redCarY)
+        // -----------------------------------------------------
+        
+
+        cX += velX;
+        cY += velY;
+        // add friction to make car slow down realistically
+        velX *= 0.9;
+        velY *= 0.9;
+        
+        ctx.drawImage(car, cX, cY)
+
+    requestAnimationFrame(draw);
+
+}
+
+// wait for images to load before drawing
+// switch to promise
+car.onload = () => {
+    draw();
+}
+
+
+// put key listeners in object to be able to press more than one key at a time
+// play with velocity
+// rotate car when turning
+// randomize cars
+// add more lanes
+// add timer (get to work on time)
+// touch screen functionality
+
+
+// https://www.youtube.com/watch?v=8uIt9a2XBrw&t=368s
+// https://www.youtube.com/watch?v=1oNsZCqQDeE
+// https://www.youtube.com/watch?v=L07i4g-zhDA
+// https://stackoverflow.com/questions/14178769/smooth-keydown-animation-on-canvas-in-javascript
+// https://stackoverflow.com/questions/38420047/how-to-add-touch-screen-functionalitytap-left-right-side-of-screen-in-html5-mo
+
+
+// ********old code***********
 
 // document.addEventListener("keydown", moveCar)
 
@@ -85,104 +297,3 @@ function moveCar() {
 //         // velY += 1;
 //     }
 // }
-    
-
-const laneOne = [];
-
-laneOne[0] = {
-    x : 500,
-    y : 0
-}
-
-const laneTwo = [];
-
-laneTwo[0] = {
-    x: 250,
-    y: 50
-}
-
-// test randomizing cars
-const carType = [car, carRed, car, carRed, car, carRed]
-let q = 0
-
-function draw() {
-
-        ctx.drawImage(bg,0,0);
-        document.addEventListener("keydown", keyListener)
-        document.addEventListener("keyup", keyListener)
-        moveCar()
-
-        for (let i = 0; i < laneOne.length; i++) {
-            // console.log(i)
-            ctx.drawImage(carType[q], laneOne[i].x, laneOne[i].y)
-            laneOne[i].y++;
-            if (laneOne[i].y === canvas.height - 360) {
-                laneOne.push({
-                    x: 500,
-                    // test randomizing cars. original was 0 - car.height
-                    y: -500 - car.height
-                })
-            }
-            // rectangle vs rectangle collision
-            if (laneOne[i].x + 25 < cX + car.width &&
-                laneOne[i].x + carRed.width - 25 > cX &&
-                laneOne[i].y + 10 < cY + car.height &&
-                laneOne[i].y + carRed.height -10 > cY) {
-                alert('collision!')
-            }
-            // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
-            if (laneOne[i].y === canvas.height) {
-                laneOne.shift()
-                i--
-                // test randomizing cars
-                q += 1
-            }
-        }
-
-        for (let j = 0; j < laneTwo.length; j++) {
-            console.log(j)
-            ctx.drawImage(carRed, laneTwo[j].x, laneTwo[j].y)
-            laneTwo[j].y = laneTwo[j].y + 2;
-            if (laneTwo[j].y === canvas.height - 300) {
-                laneTwo.push({
-                    x: 250,
-                    y: 0 - car.height
-                })
-            }
-
-            if (laneTwo[j].y === canvas.height) {
-                laneTwo.shift()
-                j--
-            }
-        }
-
-        cX += velX;
-        cY += velY;
-        velX *= 0.9;
-        velY *= 0.9;
-        
-        ctx.drawImage(car, cX, cY)
-
-    requestAnimationFrame(draw);
-
-}
-
-// wait for images to load before drawing
-car.onload = () => {
-    draw();
-}
-
-
-// put key listeners in object to be able to press more than one key at a time
-// play with velocity
-// rotate car when turning
-// randomize cars
-// add more lanes
-// add timer (get to work on time)
-// touch screen functionality
-
-
-// https://www.youtube.com/watch?v=1oNsZCqQDeE
-// https://www.youtube.com/watch?v=L07i4g-zhDA
-// https://stackoverflow.com/questions/14178769/smooth-keydown-animation-on-canvas-in-javascript
-// https://stackoverflow.com/questions/38420047/how-to-add-touch-screen-functionalitytap-left-right-side-of-screen-in-html5-mo
