@@ -24,7 +24,7 @@ carBlack.src = "./assets/black-car.png";
 bg.src = "./assets/blackRoad.jpg";
 
 let cX = 600;
-let cY = 450;
+let cY = canvas.height - 200;
 
 // have acceleration but auto deceleration
 // make left and right movement very slight
@@ -90,39 +90,39 @@ let randomCar = 0
 
 const lanes = [
     {
-        carType: carType[randomNumber(0, 5)],
-        laneX: 150,
+        carType: carType[randomNumber(0, carType.length)],
+        laneX: randomNumber(120, 310),
         laneY: -randomNumber(50, 200),
         velocityY: 0
     },
     {
         carType: carType[randomNumber(0, carType.length)],
-        laneX: 500,
+        laneX: randomNumber(400, 560),
         laneY: -randomNumber(50, 200),
         velocityY: 0
     },
     {
         carType: carType[randomNumber(0, carType.length)],
-        laneX: 650,
+        laneX: randomNumber(650, 790),
         laneY: -randomNumber(50, 200),
         velocityY: 0
     },
     {
         carType: carType[randomNumber(0, carType.length)],
-        laneX: 100,
-        laneY: -800,
+        laneX: randomNumber(120, 310),
+        laneY: -500,
         velocityY: 0
     },
     {
         carType: carType[randomNumber(0, carType.length)],
-        laneX: 450,
-        laneY: -800,
+        laneX: randomNumber(400, 560),
+        laneY: -550,
         velocityY: 0
     },
     {
         carType: carType[randomNumber(0, carType.length)],
-        laneX: 700,
-        laneY: -800,
+        laneX: randomNumber(650, 790),
+        laneY: -450,
         velocityY: 0
     }
 ]
@@ -140,11 +140,11 @@ const laneTraffic = (lane, Xmin, Xmax, velMin, velMax) => {
         alert('collision!')
     }
 
-    const randomHeight = randomNumber(100, 600)
+    // const randomHeight = randomNumber(100, 200)
 
     if (lanes[lane].laneY > canvas.height) {
         lanes[lane].laneX = randomNumber(Xmin, Xmax);
-        lanes[lane].laneY = -lanes[lane].carType.height - randomHeight
+        lanes[lane].laneY = -lanes[lane].carType.height - 100
 
         randomCar = randomNumber(0, carType.length)
         lanes[lane].carType = carType[randomCar]
@@ -158,6 +158,9 @@ let bgX = 0
 let bgY = 0
 let bgY2 = -1250
 let bgVelY = 0
+
+// car.width = 94
+// canvas.width = 1000
 
 function draw() {
         
@@ -174,7 +177,7 @@ function draw() {
         bgY += bgVelY
         bgY2 += bgVelY
         bgVelY++
-        bgVelY *= 0.9;
+        bgVelY *= 0.8;
 
         // -----------------------------------------------------------------
         setBounds()
@@ -185,12 +188,12 @@ function draw() {
 
         // -------------------------------------------------
 
-        laneTraffic('0', 50, 250, 0.8, 0.99);
-        laneTraffic('1', 300, 475, 0.7, 0.9);
-        laneTraffic('2', 550, 700, 0.5, 0.8);
-        laneTraffic('3', 50, 250, 0.8, 0.99);
-        laneTraffic('4', 30, 475, 0.7, 0.9);
-        laneTraffic('5', 550, 700, 0.5, 0.8);
+        laneTraffic(0, 120, 310, 0.89, 0.99);
+        laneTraffic(1, 400, 560, 0.89, 0.99);
+        laneTraffic(2, 650, 790, 0.89, 0.99);
+        laneTraffic(3, 120, 300, 0.89, 0.99);
+        laneTraffic(4, 400, 550, 0.89, 0.99);
+        laneTraffic(5, 650, 790, 0.89, 0.99);
 
         
         // -----------------------------------------------------
