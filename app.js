@@ -6,25 +6,28 @@ const ctx = cvs.getContext("2d");
 
 
 const car = new Image();
-const carRed = new Image();
-const carGrey = new Image();
-const carMercedes = new Image();
-const carFord = new Image();
-const carBlack = new Image();
+const asteroidBig = new Image();
+const asteroidOne = new Image();
+const asteroidTwo = new Image();
+const asteroidThree = new Image();
+const asteroidFour = new Image();
+const asteroidFive = new Image();
+const asteroidSix = new Image();
 const bg = new Image();
-const whiteLine = new Image();
 
-whiteLine.src = "./assets/white-line.jpg"
-car.src = "./assets/honda.png";
-carGrey.src = "./assets/car-small.png";
-carRed.src = "./assets/car-red-small.png";
-carMercedes.src = "./assets/mercedes.png";
-carFord.src = "./assets/ford.png";
-carBlack.src = "./assets/black-car.png";
-bg.src = "./assets/blackRoad.jpg";
+
+car.src = "./assets/ship.png";
+asteroidBig.src = "./assets/asteroidBig.png";
+asteroidOne.src = "./assets/asteroidOne.png";
+asteroidTwo.src = "./assets/asteroidTwo.png";
+asteroidThree.src = "./assets/asteroidThree.png";
+asteroidFour.src = "./assets/asteroidFour.png";
+asteroidFive.src = "./assets/asteroidFive.png"
+asteroidSix.src = "./assets/asteroidSix.png"
+bg.src = "./assets/starfield.jpg";
 
 let cX = 600;
-let cY = canvas.height - 200;
+let cY = canvas.height - 190;
 
 // have acceleration but auto deceleration
 // make left and right movement very slight
@@ -85,7 +88,7 @@ function setBounds() {
 }
 
 // randomizing cars
-const carType = [carGrey, carRed, carFord, carMercedes, carBlack]
+const carType = [asteroidBig, asteroidOne, asteroidTwo, asteroidThree, asteroidFour, asteroidFive, asteroidSix]
 let randomCar = 0
 
 const lanes = [
@@ -127,6 +130,10 @@ const lanes = [
     }
 ]
 
+let counter = 0
+
+// multiples of 13 or 14 will send rogue asteroids
+
 const laneTraffic = (lane, Xmin, Xmax, velMin, velMax) => {
     const randomVelocity = randomNumber(velMin, velMax)
     lanes[lane].laneY += lanes[lane].velocityY;
@@ -143,6 +150,7 @@ const laneTraffic = (lane, Xmin, Xmax, velMin, velMax) => {
     // const randomHeight = randomNumber(100, 200)
 
     if (lanes[lane].laneY > canvas.height) {
+        counter += 1;
         lanes[lane].laneX = randomNumber(Xmin, Xmax);
         lanes[lane].laneY = -lanes[lane].carType.height - 100
 
@@ -162,6 +170,11 @@ let bgVelY = 0
 // car.width = 94
 // canvas.width = 1000
 
+// asteroid widths 80 to 100
+
+let minVel = 0.85
+let maxVel = 0.9
+
 function draw() {
         
         // have two bg images scrolling one after the other
@@ -177,7 +190,7 @@ function draw() {
         bgY += bgVelY
         bgY2 += bgVelY
         bgVelY++
-        bgVelY *= 0.8;
+        bgVelY *= 0.7;
 
         // -----------------------------------------------------------------
         setBounds()
@@ -188,12 +201,12 @@ function draw() {
 
         // -------------------------------------------------
 
-        laneTraffic(0, 120, 310, 0.89, 0.99);
-        laneTraffic(1, 400, 560, 0.89, 0.99);
-        laneTraffic(2, 650, 790, 0.89, 0.99);
-        laneTraffic(3, 120, 300, 0.89, 0.99);
-        laneTraffic(4, 400, 550, 0.89, 0.99);
-        laneTraffic(5, 650, 790, 0.89, 0.99);
+        laneTraffic(0, 120, 310, minVel, maxVel);
+        laneTraffic(1, 400, 560, minVel, maxVel);
+        laneTraffic(2, 650, 790, minVel, maxVel);
+        laneTraffic(3, 120, 300, minVel, maxVel);
+        laneTraffic(4, 400, 550, minVel, maxVel);
+        laneTraffic(5, 650, 790, minVel, maxVel);
 
         
         // -----------------------------------------------------
