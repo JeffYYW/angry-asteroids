@@ -27,7 +27,7 @@ asteroidSix.src = "./assets/asteroidSix.png"
 bg.src = "./assets/starfield.jpg";
 
 let cX = 600;
-let cY = canvas.height - 190;
+let cY = canvas.height - 200;
 
 // have acceleration but auto deceleration
 // make left and right movement very slight
@@ -62,7 +62,7 @@ function keyListener(event) {
     }
 }
 
-function moveCar() {
+function moveShip() {
     if (controller.left) {
         velX -= 1;
     }
@@ -73,6 +73,11 @@ function moveCar() {
 
 function randomNumber(min, max) {
     let num = Math.floor(Math.random() * (max - min)) + min;
+    return num;
+}
+
+function randomDecimal(min, max) {
+    let num = Math.random() * (max - min) + min;
     return num;
 }
 
@@ -88,45 +93,52 @@ function setBounds() {
 }
 
 // randomizing cars
-const carType = [asteroidBig, asteroidOne, asteroidTwo, asteroidThree, asteroidFour, asteroidFive, asteroidSix]
-let randomCar = 0
+const asteroids = [asteroidBig, asteroidOne, asteroidTwo, asteroidThree, asteroidFour, asteroidFive, asteroidSix]
+let randomAsteroid = 0
 
 const lanes = [
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(120, 310),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -randomNumber(50, 200),
-        velocityY: 0
+        velocityX: 0,
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     },
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(400, 560),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -randomNumber(50, 200),
-        velocityY: 0
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     },
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(650, 790),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -randomNumber(50, 200),
-        velocityY: 0
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     },
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(120, 310),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -500,
-        velocityY: 0
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     },
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(400, 560),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -550,
-        velocityY: 0
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     },
     {
-        carType: carType[randomNumber(0, carType.length)],
-        laneX: randomNumber(650, 790),
+        asteroidType: asteroids[randomNumber(0, asteroids.length)],
+        laneX: randomNumber(20, 900),
         laneY: -450,
-        velocityY: 0
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.75, 0.83)
     }
 ]
 
@@ -134,16 +146,16 @@ let counter = 0
 
 // multiples of 13 or 14 will send rogue asteroids
 
-const laneTraffic = (lane, Xmin, Xmax, velMin, velMax) => {
-    const randomVelocity = randomNumber(velMin, velMax)
+const laneTraffic = (lane, Xmin, Xmax) => {
+    // const randomVelocity = randomNumber(velMin, velMax)
     lanes[lane].laneY += lanes[lane].velocityY;
     lanes[lane].velocityY++;
-    lanes[lane].velocityY *= randomVelocity;
+    lanes[lane].velocityY *= lanes[lane].randomVelocity;
 
     if (lanes[lane].laneX + 25 < cX + car.width &&
-        lanes[lane].laneX + lanes[lane].carType.width - 25 > cX &&
+        lanes[lane].laneX + lanes[lane].asteroidType.width - 25 > cX &&
         lanes[lane].laneY + 10 < cY + car.height &&
-        lanes[lane].laneY + lanes[lane].carType.height - 10 > cY) {
+        lanes[lane].laneY + lanes[lane].asteroidType.height - 10 > cY) {
         alert('collision!')
     }
 
@@ -152,14 +164,49 @@ const laneTraffic = (lane, Xmin, Xmax, velMin, velMax) => {
     if (lanes[lane].laneY > canvas.height) {
         counter += 1;
         lanes[lane].laneX = randomNumber(Xmin, Xmax);
-        lanes[lane].laneY = -lanes[lane].carType.height - 100
+        lanes[lane].laneY = -lanes[lane].asteroidType.height - 100
 
-        randomCar = randomNumber(0, carType.length)
-        lanes[lane].carType = carType[randomCar]
+        randomAsteroid = randomNumber(0, asteroids.length)
+        lanes[lane].asteroidType = asteroids[randomAsteroid]
+        lanes[lane].randomVelocity = randomDecimal(0.75, 0.83)
     }
 
-    ctx.drawImage(lanes[lane].carType, lanes[lane].laneX, lanes[lane].laneY)
+    ctx.drawImage(lanes[lane].asteroidType, lanes[lane].laneX, lanes[lane].laneY)
 }
+
+// const rogueObjects = [
+//     {
+//         x: 50,
+//         y: -100
+//     }
+// ]
+
+// const rogueAsteroid = function() {
+//     for (let i = 0; i < rogueObjects.length; i++) {
+//         // console.log(i)
+//         ctx.drawImage(asteroids[0], rogueObjects[i].x, rogueObjects[i].y)
+//         rogueObjects[i].y = rogueObjects[i].y + 7;
+//         rogueObjects[i].x = rogueObjects[i].x + 1;
+//         if (rogueObjects[i].y === canvas.height) {
+//             rogueObjects.push({
+//                 x: randomNumber(300, 350),
+//                 y: -100
+//             })
+//         }
+
+//         if (rogueObjects[i] + 25 < cX + car.width &&
+//             rogueObjects[i] + rogueObjects[i].width - 25 > cX &&
+//             rogueObjects[i] + 10 < cY + car.height &&
+//             rogueObjects[i] + rogueObjects[i].height - 10 > cY) {
+//             alert('collision!')
+//         }
+
+//         if (rogueObjects[i].y > canvas.height) {
+//             rogueObjects.shift()
+//             i--
+//         }
+//     }
+// }
 
 // background initial values
 let bgX = 0
@@ -171,9 +218,6 @@ let bgVelY = 0
 // canvas.width = 1000
 
 // asteroid widths 80 to 100
-
-let minVel = 0.85
-let maxVel = 0.9
 
 function draw() {
         
@@ -197,16 +241,24 @@ function draw() {
 
         document.addEventListener("keydown", keyListener)
         document.addEventListener("keyup", keyListener)
-        moveCar()
+        moveShip()
 
         // -------------------------------------------------
 
-        laneTraffic(0, 120, 310, minVel, maxVel);
-        laneTraffic(1, 400, 560, minVel, maxVel);
-        laneTraffic(2, 650, 790, minVel, maxVel);
-        laneTraffic(3, 120, 300, minVel, maxVel);
-        laneTraffic(4, 400, 550, minVel, maxVel);
-        laneTraffic(5, 650, 790, minVel, maxVel);
+        // for loop lanes array
+        laneTraffic(0, 20, 900);
+        laneTraffic(1, 20, 900);
+        laneTraffic(2, 20, 900);
+        laneTraffic(3, 20, 900);
+        laneTraffic(4, 20, 900);
+        laneTraffic(5, 20, 900);
+
+        
+
+        // cant use the same asteroid or it will conflict with the one already on screen
+        if (counter % 20 === 0) {
+            // laneTraffic(0, 20, 900)
+        }
 
         
         // -----------------------------------------------------
@@ -341,3 +393,12 @@ car.onload = () => {
         //         randomCar = randomNumber(0, 4)
         //     }
         // }
+
+        // original lanes
+
+    // laneTraffic(0, 120, 310);
+    // laneTraffic(1, 400, 560);
+    // laneTraffic(2, 650, 790);
+    // laneTraffic(3, 120, 300);
+    // laneTraffic(4, 400, 550);
+    // laneTraffic(5, 650, 790);
