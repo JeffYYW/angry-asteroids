@@ -180,3 +180,9 @@ legend, button::-moz-focus-inner, input::-moz-focus-inner {
 #canvas {
   background-color: dodgerblue;
 }
+
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
