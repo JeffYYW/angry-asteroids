@@ -179,10 +179,27 @@ legend, button::-moz-focus-inner, input::-moz-focus-inner {
 
 #canvas {
   background-color: dodgerblue;
+  max-height: 1250px;
+  max-width: 1000px;
 }
 
 .container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  position: relative;
+  border: 2px solid blue;
+}
+
+.scoreContainer {
+  position: absolute;
+  top: 2%;
+  left: 15%;
+}
+
+h1 {
+  color: white;
 }

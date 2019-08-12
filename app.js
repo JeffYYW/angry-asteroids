@@ -27,6 +27,7 @@ asteroidFive.src = "./assets/asteroidFive.png"
 asteroidSix.src = "./assets/asteroidSix.png"
 bg.src = "./assets/starfield.jpg";
 
+// put in object
 let cX = 600;
 let cY = canvas.height - 200;
 
@@ -159,8 +160,6 @@ const renderAsteroid = (asteroid, Xmin, Xmax) => {
         alert('collision!')
     }
 
-    // const randomHeight = randomNumber(100, 200)
-
     if (asteroids[asteroid].laneY > canvas.height) {
         counter += 1;
         score.innerHTML = counter;
@@ -175,39 +174,80 @@ const renderAsteroid = (asteroid, Xmin, Xmax) => {
     ctx.drawImage(asteroids[asteroid].asteroidType, asteroids[asteroid].laneX, asteroids[asteroid].laneY)
 }
 
-// const rogueObjects = [
-//     {
-//         x: 50,
-//         y: -100
-//     }
-// ]
+const rogueObjects = [
+    {
+        asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+        laneX: randomNumber(-50, 650),
+        laneY: -450,
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.78, 0.86)
+    },
+    {
+        asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+        laneX: randomNumber(650, 1050),
+        laneY: -450,
+        velocityY: 0,
+        randomVelocity: randomDecimal(0.78, 0.86)
+    }
+]
 
-// const rogueAsteroid = function() {
-//     for (let i = 0; i < rogueObjects.length; i++) {
-//         // console.log(i)
-//         ctx.drawImage(asteroids[0], rogueObjects[i].x, rogueObjects[i].y)
-//         rogueObjects[i].y = rogueObjects[i].y + 7;
-//         rogueObjects[i].x = rogueObjects[i].x + 1;
-//         if (rogueObjects[i].y === canvas.height) {
-//             rogueObjects.push({
-//                 x: randomNumber(300, 350),
-//                 y: -100
-//             })
-//         }
+const rogueAsteroidLeft = (asteroid, Xmin, Xmax) => {
+    rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
+    rogueObjects[asteroid].velocityY++;
+    rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
 
-//         if (rogueObjects[i] + 25 < cX + car.width &&
-//             rogueObjects[i] + rogueObjects[i].width - 25 > cX &&
-//             rogueObjects[i] + 10 < cY + car.height &&
-//             rogueObjects[i] + rogueObjects[i].height - 10 > cY) {
-//             alert('collision!')
-//         }
+    rogueObjects[asteroid].laneX += 3
+    
 
-//         if (rogueObjects[i].y > canvas.height) {
-//             rogueObjects.shift()
-//             i--
-//         }
-//     }
-// }
+    if (rogueObjects[asteroid].laneX + 25 < cX + spaceShip.width &&
+        rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > cX &&
+        rogueObjects[asteroid].laneY + 15 < cY + spaceShip.height &&
+        rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > cY) {
+        alert('collision!')
+    }
+
+    if (rogueObjects[asteroid].laneY > canvas.height) {
+        counter += 1;
+        score.innerHTML = counter;
+        rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
+        rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
+
+        randomAsteroid = randomNumber(0, asteroidImages.length)
+        rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
+        rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
+    }
+
+    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
+}
+
+const rogueAsteroidRight = (asteroid, Xmin, Xmax) => {
+    rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
+    rogueObjects[asteroid].velocityY++;
+    rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
+
+    rogueObjects[asteroid].laneX -= 3
+
+
+    if (rogueObjects[asteroid].laneX + 25 < cX + spaceShip.width &&
+        rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > cX &&
+        rogueObjects[asteroid].laneY + 15 < cY + spaceShip.height &&
+        rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > cY) {
+        alert('collision!')
+    }
+
+    if (rogueObjects[asteroid].laneY > canvas.height) {
+        counter += 1;
+        score.innerHTML = counter;
+        rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
+        rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
+
+        randomAsteroid = randomNumber(0, asteroidImages.length)
+        rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
+        rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
+    }
+
+    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
+}
 
 // background initial values
 let bgX = 0
@@ -252,19 +292,21 @@ function draw() {
             renderAsteroid(i, 20, 900)
         }
 
-        // laneTraffic(0, 20, 900);
-        // laneTraffic(1, 20, 900);
-        // laneTraffic(2, 20, 900);
-        // laneTraffic(3, 20, 900);
-        // laneTraffic(4, 20, 900);
-        // laneTraffic(5, 20, 900);
+        rogueAsteroidLeft(0, -50, 650)
+        rogueAsteroidRight(1, 650, 1050)
   
         
-
         // cant use the same asteroid or it will conflict with the one already on screen
-        if (counter % 20 === 0) {
-            // laneTraffic(0, 20, 900)
-        }
+        // the score will remain at 20 longer than expected, so the page will fill with asteroids
+        // if (counter === 20) {
+        //     asteroids.push({
+        //         asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+        //         laneX: randomNumber(20, 900),
+        //         laneY: -450,
+        //         velocityY: 0,
+        //         randomVelocity: randomDecimal(0.75, 0.83)
+        //     })
+        // }
 
         
         // -----------------------------------------------------
