@@ -17,7 +17,7 @@ const asteroidSix = new Image();
 const bg = new Image();
 
 
-spaceShip.src = "./assets/ship.png";
+spaceShip.src = "./assets/rocketShip.png";
 asteroidBig.src = "./assets/asteroidBig.png";
 asteroidOne.src = "./assets/asteroidOne.png";
 asteroidTwo.src = "./assets/asteroidTwo.png";
@@ -27,16 +27,16 @@ asteroidFive.src = "./assets/asteroidFive.png"
 asteroidSix.src = "./assets/asteroidSix.png"
 bg.src = "./assets/starfield.jpg";
 
+
 // put in object
-let cX = 600;
-let cY = canvas.height - 200;
 
-// have acceleration but auto deceleration
-// make left and right movement very slight
+const ship = {
+    shipX: 450,
+    shipY: canvas.height - 200,
+    velX: 0,
+    velY: 0
+}
 
-let velX = 0;
-let velY = 0;
-// maxSpeed = 10;
 
 const controller = {
     left: false,
@@ -66,31 +66,34 @@ function keyListener(event) {
 
 function moveShip() {
     if (controller.left) {
-        velX -= 1;
+        ship.velX -= 1;
     }
     if (controller.right) {
-        velX += 1;
+        ship.velX += 1;
     }
 }
 
-function randomNumber(min, max) {
+// generate random number between min and max values
+const randomNumber = (min, max) => {
     let num = Math.floor(Math.random() * (max - min)) + min;
     return num;
 }
 
-function randomDecimal(min, max) {
+// for generating a random number lower than 1 and between min and max values
+const randomDecimal = (min, max) => {
     let num = Math.random() * (max - min) + min;
     return num;
 }
 
-function setBounds() {
-    if (cX <= 10) {
-        cX = 10
-        velX = 0;
+// ship won't go past the screens on the left and right sides
+const setBounds = () => {
+    if (ship.shipX <= 10) {
+        ship.shipX = 10
+        ship.velX = 0;
     }
-    if (cX + spaceShip.width >= cvs.width) {
-        cX = cvs.width - spaceShip.width;
-        velX = 0;
+    if (ship.shipX + spaceShip.width >= cvs.width) {
+        ship.shipX = cvs.width - spaceShip.width;
+        ship.velX = 0;
     }
 }
 
@@ -145,33 +148,48 @@ const asteroids = [
 
 let counter = 0
 
-// multiples of 13 or 14 will send rogue asteroids
-
-const renderAsteroid = (asteroid, Xmin, Xmax) => {
-    // const randomVelocity = randomNumber(velMin, velMax)
-    asteroids[asteroid].laneY += asteroids[asteroid].velocityY;
-    asteroids[asteroid].velocityY++;
-    asteroids[asteroid].velocityY *= asteroids[asteroid].randomVelocity;
-
-    if (asteroids[asteroid].laneX + 25 < cX + spaceShip.width &&
-        asteroids[asteroid].laneX + asteroids[asteroid].asteroidType.width - 25 > cX &&
-        asteroids[asteroid].laneY + 15 < cY + spaceShip.height &&
-        asteroids[asteroid].laneY + asteroids[asteroid].asteroidType.height - 15 > cY) {
+// collision detection
+const collisionDetection = (array, index) => {
+    if (array[index].laneX + 25 < ship.shipX + spaceShip.width &&
+        array[index].laneX + array[index].asteroidType.width - 25 > ship.shipX &&
+        array[index].laneY + 25 < ship.shipY + spaceShip.height &&
+        array[index].laneY + array[index].asteroidType.height - 15 > ship.shipY) {
         alert('collision!')
     }
+}
 
-    if (asteroids[asteroid].laneY > canvas.height) {
+// set asteroid's Y velocity and position
+// velocity is increased by 1 with every iteration, but by multiplying it with a number less than 1, it will get closer and closer to 0, thus slowing it down gradually
+// cant just change the Y position since it is redrawn everytime and the program will stutter. Using velocity allows smoother animation and makes it easier to randomize the asteroid velocity
+const setVelocityY = (array, index) => {
+    array[index].laneY += array[index].velocityY;
+    array[index].velocityY++;
+    array[index].velocityY *= array[index].randomVelocity;
+}
+
+// reset asteroid's position once it has passed the height of the canvas
+const resetAsteroid = (array, index, Xmin, Xmax, velMin, velMax) => {
+    if (array[index].laneY > canvas.height) {
+        // increase score counter by 1
         counter += 1;
         score.innerHTML = counter;
-        asteroids[asteroid].laneX = randomNumber(Xmin, Xmax);
-        asteroids[asteroid].laneY = -asteroids[asteroid].asteroidType.height - 100
-
+        // asteroid's starting X position set to a random number
+        // Y position reset and hard coded to have less overlap with other asteroids
+        array[index].laneX = randomNumber(Xmin, Xmax);
+        array[index].laneY = -array[index].asteroidType.height - 100
+        // randomize asteroid type and velocity
         randomAsteroid = randomNumber(0, asteroidImages.length)
-        asteroids[asteroid].asteroidType = asteroidImages[randomAsteroid]
-        asteroids[asteroid].randomVelocity = randomDecimal(0.75, 0.83)
+        array[index].asteroidType = asteroidImages[randomAsteroid]
+        array[index].randomVelocity = randomDecimal(velMin, velMax)
     }
+}
 
-    ctx.drawImage(asteroids[asteroid].asteroidType, asteroids[asteroid].laneX, asteroids[asteroid].laneY)
+const renderAsteroid = (asteroid, Xmin, Xmax) => {
+
+    setVelocityY(asteroids, asteroid);
+    collisionDetection(asteroids, asteroid);
+    resetAsteroid(asteroids, asteroid, Xmin, Xmax, 0.75, 0.83);
+    ctx.drawImage(asteroids[asteroid].asteroidType, asteroids[asteroid].laneX, asteroids[asteroid].laneY);
 }
 
 const rogueObjects = [
@@ -192,92 +210,51 @@ const rogueObjects = [
 ]
 
 const rogueAsteroidLeft = (asteroid, Xmin, Xmax) => {
-    rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
-    rogueObjects[asteroid].velocityY++;
-    rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
 
-    rogueObjects[asteroid].laneX += 3
-    
-
-    if (rogueObjects[asteroid].laneX + 25 < cX + spaceShip.width &&
-        rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > cX &&
-        rogueObjects[asteroid].laneY + 15 < cY + spaceShip.height &&
-        rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > cY) {
-        alert('collision!')
-    }
-
-    if (rogueObjects[asteroid].laneY > canvas.height) {
-        counter += 1;
-        score.innerHTML = counter;
-        rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
-        rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
-
-        randomAsteroid = randomNumber(0, asteroidImages.length)
-        rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
-        rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
-    }
-
-    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
+    setVelocityY(rogueObjects, asteroid);
+    rogueObjects[asteroid].laneX += 3;
+    collisionDetection(rogueObjects, asteroid);
+    resetAsteroid(rogueObjects, asteroid, Xmin, Xmax, 0.78, 0.9);
+    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY);
 }
 
 const rogueAsteroidRight = (asteroid, Xmin, Xmax) => {
-    rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
-    rogueObjects[asteroid].velocityY++;
-    rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
 
-    rogueObjects[asteroid].laneX -= 3
-
-
-    if (rogueObjects[asteroid].laneX + 25 < cX + spaceShip.width &&
-        rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > cX &&
-        rogueObjects[asteroid].laneY + 15 < cY + spaceShip.height &&
-        rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > cY) {
-        alert('collision!')
-    }
-
-    if (rogueObjects[asteroid].laneY > canvas.height) {
-        counter += 1;
-        score.innerHTML = counter;
-        rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
-        rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
-
-        randomAsteroid = randomNumber(0, asteroidImages.length)
-        rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
-        rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
-    }
-
-    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
+    setVelocityY(rogueObjects, asteroid);
+    rogueObjects[asteroid].laneX -= 3;
+    collisionDetection(rogueObjects, asteroid);
+    resetAsteroid(rogueObjects, asteroid, Xmin, Xmax, 0.78, 0.9);
+    ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY);
 }
 
 // background initial values
-let bgX = 0
-let bgY = 0
-let bgY2 = -1250
-let bgVelY = 0
 
-// car.width = 94
-// canvas.width = 1000
-
-// asteroid widths 80 to 100
+const backgroundValues = {
+    bgX: 0,
+    bgY: 0,
+    bgY2: -1250,
+    bgVelY: 0
+}
 
 function draw() {
         
-        // have two bg images scrolling one after the other
-        console.log(bgY)
-        ctx.drawImage(bg, bgX, bgY);
-        ctx.drawImage(bg, bgX, bgY2);
-        if (bgY > canvas.height) {
-            bgY = -1250;
+    // have two bg images scrolling one after the other
+    console.log(backgroundValues.bgY)
+    ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY);
+    ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY2);
+        if (backgroundValues.bgY > canvas.height) {
+            backgroundValues.bgY = -1250;
         }
-        if (bgY2 > canvas.height) {
-            bgY2 = -1250;
+        if (backgroundValues.bgY2 > canvas.height) {
+            backgroundValues.bgY2 = -1250;
         }
-        bgY += bgVelY
-        bgY2 += bgVelY
-        bgVelY++
-        bgVelY *= 0.73;
+        backgroundValues.bgY += backgroundValues.bgVelY
+        backgroundValues.bgY2 += backgroundValues.bgVelY
+        backgroundValues.bgVelY++
+        backgroundValues.bgVelY *= 0.73;
 
         // -----------------------------------------------------------------
+        // ship won't go past the screens on the left and right sides
         setBounds()
 
         document.addEventListener("keydown", keyListener)
@@ -286,38 +263,24 @@ function draw() {
 
         // -------------------------------------------------
 
-        // for loop lanes array
-
+        // loop through asteroids array and render them
         for (i = 0; i < asteroids.length; i++) {
             renderAsteroid(i, 20, 900)
         }
 
+        // render rogue asteroids
         rogueAsteroidLeft(0, -50, 650)
         rogueAsteroidRight(1, 650, 1050)
   
-        
-        // cant use the same asteroid or it will conflict with the one already on screen
-        // the score will remain at 20 longer than expected, so the page will fill with asteroids
-        // if (counter === 20) {
-        //     asteroids.push({
-        //         asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
-        //         laneX: randomNumber(20, 900),
-        //         laneY: -450,
-        //         velocityY: 0,
-        //         randomVelocity: randomDecimal(0.75, 0.83)
-        //     })
-        // }
-
-        
         // -----------------------------------------------------
         
-        cX += velX;
-        cY += velY;
+        ship.shipX += ship.velX;
+        ship.shipY += ship.velY;
         // add friction to make car slow down realistically
-        velX *= 0.9;
-        velY *= 0.9;
+        ship.velX *= 0.9;
+        ship.velY *= 0.9;
         
-        ctx.drawImage(spaceShip, cX, cY)
+    ctx.drawImage(spaceShip, ship.shipX, ship.shipY)
 
     requestAnimationFrame(draw);
 }
@@ -329,7 +292,8 @@ spaceShip.onload = () => {
 }
 
 
-
+// cant use the same asteroid or it will conflict with the one already on screen
+        // the score will remain at 20 longer than expected, so the page will fill with asteroids
 
 
 // put key listeners in object to be able to press more than one key at a time
@@ -349,104 +313,85 @@ spaceShip.onload = () => {
 // https://stackoverflow.com/questions/38420047/how-to-add-touch-screen-functionalitytap-left-right-side-of-screen-in-html5-mo
 
 
-// ********old code***********
+// ********before refactor***********
 
-// document.addEventListener("keydown", moveCar)
+// let shipX = 450;
+// let shipY = canvas.height - 200;
 
-// function moveCar(event) {
-//     // move left if cX is not too near the left side of the canvas
-//     if (event.keyCode === 37 && cX > 10) {
-//         cX -= 20;
-//         // velX -= 1;
+// let velX = 0;
+// let velY = 0;
+
+// let bgX = 0
+// let bgY = 0
+// let bgY2 = -1250
+// let bgVelY = 0
+
+// car.width = 94
+// canvas.width = 1000
+
+// asteroid widths 80 to 100
+
+// const renderAsteroid = (asteroid, Xmin, Xmax) => {
+//     // set asteroid's Y velocity and position
+//     // velocity is increased by 1 with every iteration, but by multiplying it with a number less than 1, it will get closer and closer to 0, thus slowing it down gradually
+//     // cant just change the Y position since it is redrawn everytime and the program will stutter. Using velocity allows smoother animation and makes it easier to randomize the asteroid velocity
+
+//     asteroids[asteroid].laneY += asteroids[asteroid].velocityY;
+//     asteroids[asteroid].velocityY++;
+//     asteroids[asteroid].velocityY *= asteroids[asteroid].randomVelocity;
+
+//     // collision detection
+
+//     if (asteroids[asteroid].laneX + 25 < shipX + spaceShip.width &&
+//         asteroids[asteroid].laneX + asteroids[asteroid].asteroidType.width - 25 > shipX &&
+//         asteroids[asteroid].laneY + 25 < shipY + spaceShip.height &&
+//         asteroids[asteroid].laneY + asteroids[asteroid].asteroidType.height - 15 > shipY) {
+//         alert('collision!')
 //     }
-//     // move right if the left side of the car is not too near the right of the canvas
-//     if (event.keyCode === 39 && cX < cvs.width - 150) {
-//         cX += 20;
-//         // velX += 1;
+
+//     // reset asteroid's position once it has passed the height of the canvas
+ 
+//     if (asteroids[asteroid].laneY > canvas.height) {
+//         // increase score counter by 1
+//         counter += 1;
+//         score.innerHTML = counter;
+//         // asteroid's starting X position set to a random number
+//         // Y position reset and hard coded to have less overlap with other asteroids
+//         asteroids[asteroid].laneX = randomNumber(Xmin, Xmax);
+//         asteroids[asteroid].laneY = -asteroids[asteroid].asteroidType.height - 100
+//         // randomize asteroid type and velocity
+//         randomAsteroid = randomNumber(0, asteroidImages.length)
+//         asteroids[asteroid].asteroidType = asteroidImages[randomAsteroid]
+//         asteroids[asteroid].randomVelocity = randomDecimal(0.75, 0.83)
 //     }
-//     // move up if cY is not too near the top of the canvas 
-//     if (event.keyCode === 38 && cY > 10) {
-//         cY -= 20;
-//         // velY -= 1;
-//     }
-//     // move down if the car's cY point + its height (bottom of car) is not too near the bottom of the canvas 
-//     if (event.keyCode === 40 && cY < cvs.height - 255) {
-//         cY += 20;
-//         // velY += 1;
-//     }
+
+//     ctx.drawImage(asteroids[asteroid].asteroidType, asteroids[asteroid].laneX, asteroids[asteroid].laneY)
 // }
 
-// must use length in the loop since it iterates to a number too fast. 
-        // for (let j = 0; j < laneTwo.length; j++) {
-        //     console.log(j)
-        //     ctx.drawImage(carRed, laneTwo[j].x, laneTwo[j].y)
-        //     laneTwo[j].y = laneTwo[j].y + 2;
-        //     if (laneTwo[j].y === canvas.height - 300) {
-        //         laneTwo.push({
-        //             x: randomNumber(300, 350),
-        //             y: -750
-        //         })
-        //     }
+// const rogueAsteroidLeft = (asteroid, Xmin, Xmax) => {
+//     rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
+//     rogueObjects[asteroid].velocityY++;
+//     rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
 
-        //     if (laneTwo[j].y > canvas.height) {
-        //         laneTwo.shift()
-        //         j--
-        //     }
-        // }
+//     rogueObjects[asteroid].laneX += 3
 
-        // const randoVel = randomNumber(0.7, 0.9)
-        // redCarY += velRedY
-        // velRedY++
-        // velRedY *= randoVel;
+//     if (rogueObjects[asteroid].laneX + 25 < shipX + spaceShip.width &&
+//         rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > shipX &&
+//         rogueObjects[asteroid].laneY + 25 < shipY + spaceShip.height &&
+//         rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > shipY) {
+//         alert('collision!')
+//     }
 
-        // const rando = randomNumber(100, 150)
+//     if (rogueObjects[asteroid].laneY > canvas.height) {
+//         counter += 1;
+//         score.innerHTML = counter;
+//         rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
+//         rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
 
-        // if (redCarY > canvas.height) {
-        //     redCarY = -carRed.height - rando
-        // }
+//         randomAsteroid = randomNumber(0, asteroidImages.length)
+//         rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
+//         rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
+//     }
 
-        // if (redCarX + 25 < cX + car.width &&
-        //     redCarX + carRed.width - 25 > cX &&
-        //     redCarY + 10 < cY + car.height &&
-        //     redCarY + carRed.height - 10 > cY) {
-        //     alert('collision!')
-        // }
-
-        // ctx.drawImage(carRed, redCarX, redCarY)
-
-        // for (let i = 0; i < laneOne.length; i++) {
-        //     // console.log(i)
-        //     ctx.drawImage(carType[randomCar], laneOne[i].x, laneOne[i].y)
-        //     laneOne[i].y++;
-        //     if (laneOne[i].y === canvas.height - 360) {
-        //         laneOne.push({
-        //             x: 500,
-        //             // test randomizing cars. original was 0 - car.height
-        //             y: -500 - car.height
-        //         })
-        //     }
-        //     // rectangle vs rectangle collision
-        //     if (laneOne[i].x + 25 < cX + car.width &&
-        //         laneOne[i].x + carRed.width - 25 > cX &&
-        //         laneOne[i].y + 10 < cY + car.height &&
-        //         laneOne[i].y + carRed.height -10 > cY) {
-        //         alert('collision!')
-        //     }
-        //     // remove array item when it disappears off screen to save memory space, offset counter by 1 to compensate
-        //     if (laneOne[i].y === canvas.height) {
-        //         laneOne.shift()
-        //         i--
-        //         // test randomizing cars
-
-        //         randomCar = randomNumber(0, 4)
-        //     }
-        // }
-
-        // original lanes
-
-    // laneTraffic(0, 120, 310);
-    // laneTraffic(1, 400, 560);
-    // laneTraffic(2, 650, 790);
-    // laneTraffic(3, 120, 300);
-    // laneTraffic(4, 400, 550);
-    // laneTraffic(5, 650, 790);
+//     ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
+// }
