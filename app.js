@@ -1,5 +1,6 @@
 const container = document.querySelector('.container');
 const playButton = document.querySelector('.controls');
+const scoreContainer = document.querySelector('.scoreContainer');
 // const finalScore = document.querySelector('.finalScore');
 const endScreen = document.querySelector('.endScreen')
 const finalCount = document.getElementById('finalCount');
@@ -321,6 +322,7 @@ spaceShip.onload = () => {
     title.addEventListener('click', event => {
         event.preventDefault();
         title.style.display = 'none';
+        scoreContainer.style.display = 'block';
         draw();
     })
     document.addEventListener('keypress', event => {
@@ -328,6 +330,7 @@ spaceShip.onload = () => {
         if (event.keyCode === 13 && showTitle === true) {
             showTitle = false;
             title.style.display = 'none';
+            scoreContainer.style.display = 'block';
             draw();
         }
     })
