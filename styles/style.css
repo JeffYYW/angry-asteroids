@@ -184,13 +184,15 @@ h1, h2 {
 
 #canvas {
   background-image: url("./../assets/starfield.jpg");
-  max-height: 1250px;
   max-width: 1000px;
+  max-height: 1250px;
   height: 100%;
   width: 100%;
 }
 
 .container {
+  width: 100vw;
+  height: 100vh;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -201,8 +203,6 @@ h1, h2 {
       -ms-flex-align: center;
           align-items: center;
   position: relative;
-  height: 100vh;
-  width: 100vw;
   background: #0f0c29;
   /* fallback for old browsers */
   /* Chrome 10-25, Safari 5.1-6 */
@@ -212,12 +212,6 @@ h1, h2 {
 }
 
 .titleOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: url("./../assets/starfield.jpg");
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -227,17 +221,17 @@ h1, h2 {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: url("./../assets/starfield.jpg");
 }
 
 .titleContainer {
-  padding: 0 20px;
-  padding-bottom: 40px;
-  text-align: center;
-  color: #fff;
-  font-family: 'Space Mono', monospace;
   width: 50%;
   height: 80%;
-  border: 2px outset white;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -245,12 +239,17 @@ h1, h2 {
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 0 20px 40px 20px;
+  border: 2px outset #fff;
+  font-family: 'Space Mono', monospace;
+  text-align: center;
+  color: #fff;
   background: #0f0c29;
   /* fallback for old browsers */
   /* Chrome 10-25, Safari 5.1-6 */
@@ -269,20 +268,30 @@ h1, h2 {
   text-shadow: 1px 1px 1px #919191, 1px 2px 1px #919191, 1px 3px 1px #919191, 1px 4px 1px #919191, 1px 5px 1px #919191, 1px 6px 1px #919191, 1px 7px 1px #919191, 1px 8px 1px #919191, 1px 9px 1px #919191, 1px 10px 1px #919191, 1px 18px 6px rgba(16, 16, 16, 0.4), 1px 22px 10px rgba(16, 16, 16, 0.2), 1px 25px 35px rgba(16, 16, 16, 0.2), 1px 30px 60px rgba(16, 16, 16, 0.4);
 }
 
+.titleImage {
+  -webkit-animation: titleAnimation linear 6s;
+          animation: titleAnimation linear 6s;
+}
+
+.fadeOut {
+  -webkit-transition: opacity 1000ms;
+  transition: opacity 1000ms;
+  -webkit-animation: fade 1s;
+          animation: fade 1s;
+  opacity: 0;
+}
+
 .scoreContainer {
   position: absolute;
   top: 2%;
   left: 20%;
-  color: white;
+  color: #fff;
   display: none;
 }
 
 .endScreen {
-  color: #fff;
-  position: absolute;
   width: 50%;
   height: 50%;
-  border: 2px outset white;
   display: none;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
@@ -293,7 +302,10 @@ h1, h2 {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  position: absolute;
+  border: 2px outset white;
   font-family: 'Space Mono', monospace;
+  color: #fff;
   background: #0f0c29;
   /* fallback for old browsers */
   /* Chrome 10-25, Safari 5.1-6 */
@@ -316,19 +328,142 @@ h1, h2 {
   width: 300px;
   height: 100px;
   border-radius: 100px;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 24px;
   background: #0f0c29;
   /* fallback for old browsers */
   /* Chrome 10-25, Safari 5.1-6 */
   background: -webkit-gradient(linear, left top, right top, from(#24243e), color-stop(#302b63), to(#0f0c29));
   background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  color: #fff;
-  text-transform: uppercase;
-  font-size: 24px;
 }
 
-@media (max-width: 1020px) {
+/* =============================================== */
+/* Keyframes*/
+/* =============================================== */
+@-webkit-keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes titleAnimation {
+  0% {
+    -webkit-transform: translateX(-25px);
+            transform: translateX(-25px);
+  }
+  10% {
+    -webkit-transform: translateX(-50px);
+            transform: translateX(-50px);
+  }
+  20% {
+    -webkit-transform: translateX(-75px);
+            transform: translateX(-75px);
+  }
+  30% {
+    -webkit-transform: translateX(-50px);
+            transform: translateX(-50px);
+  }
+  40% {
+    -webkit-transform: translateX(-25px);
+            transform: translateX(-25px);
+  }
+  50% {
+    -webkit-transform: translateX(0px);
+            transform: translateX(0px);
+  }
+  60% {
+    -webkit-transform: translateX(25px);
+            transform: translateX(25px);
+  }
+  70% {
+    -webkit-transform: translateX(50px);
+            transform: translateX(50px);
+  }
+  80% {
+    -webkit-transform: translateX(75px);
+            transform: translateX(75px);
+  }
+  90% {
+    -webkit-transform: translateX(50px);
+            transform: translateX(50px);
+  }
+  100% {
+    -webkit-transform: translateX(25px);
+            transform: translateX(25px);
+  }
+}
+
+@keyframes titleAnimation {
+  0% {
+    -webkit-transform: translateX(-25px);
+            transform: translateX(-25px);
+  }
+  10% {
+    -webkit-transform: translateX(-50px);
+            transform: translateX(-50px);
+  }
+  20% {
+    -webkit-transform: translateX(-75px);
+            transform: translateX(-75px);
+  }
+  30% {
+    -webkit-transform: translateX(-50px);
+            transform: translateX(-50px);
+  }
+  40% {
+    -webkit-transform: translateX(-25px);
+            transform: translateX(-25px);
+  }
+  50% {
+    -webkit-transform: translateX(0px);
+            transform: translateX(0px);
+  }
+  60% {
+    -webkit-transform: translateX(25px);
+            transform: translateX(25px);
+  }
+  70% {
+    -webkit-transform: translateX(50px);
+            transform: translateX(50px);
+  }
+  80% {
+    -webkit-transform: translateX(75px);
+            transform: translateX(75px);
+  }
+  90% {
+    -webkit-transform: translateX(50px);
+            transform: translateX(50px);
+  }
+  100% {
+    -webkit-transform: translateX(25px);
+            transform: translateX(25px);
+  }
+}
+
+/* =============================================== */
+/* Media Queries*/
+/* =============================================== */
+@media (max-width: 1040px) {
   .titleContainer h1 {
     font-size: 60px;
+  }
+}
+
+@media (max-width: 900px) {
+  .titleContainer {
+    width: 80%;
   }
 }

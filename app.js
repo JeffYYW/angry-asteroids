@@ -1,21 +1,18 @@
 const container = document.querySelector('.container');
 const playButton = document.querySelector('.controls');
 const scoreContainer = document.querySelector('.scoreContainer');
-// const finalScore = document.querySelector('.finalScore');
 const endScreen = document.querySelector('.endScreen')
 const finalCount = document.getElementById('finalCount');
 const title = document.querySelector('.titleOverlay');
 const endTitle = document.querySelector('#endTitle');
+const score = document.getElementById('scoreNumber')
 
 const cvs = document.getElementById('canvas');
 
 cvs.width = '1000';
-// cvs.height = '700';
 cvs.height = window.innerHeight;
 
 const ctx = cvs.getContext("2d");
-
-const score = document.getElementById('scoreNumber')
 
 const spaceShip = new Image();
 const asteroidBig = new Image();
@@ -27,7 +24,6 @@ const asteroidFive = new Image();
 const asteroidSix = new Image();
 const bg = new Image();
 
-
 spaceShip.src = "./assets/rocketShip.png";
 asteroidBig.src = "./assets/asteroidBig.png";
 asteroidOne.src = "./assets/asteroidOne.png";
@@ -38,9 +34,7 @@ asteroidFive.src = "./assets/asteroidFive.png"
 asteroidSix.src = "./assets/asteroidSix.png"
 bg.src = "./assets/starfield.jpg";
 
-
-// put in object
-
+// the two variables and functions below deal with the ship controller
 const ship = {
     shipX: 450,
     shipY: canvas.height - 200,
@@ -48,20 +42,18 @@ const ship = {
     velY: 0
 }
 
-
 const controller = {
     left: false,
     right: false
 }
 
-function keyListener(event) {
+const keyListener = (event) => {
     let keyState = false;
     controller.left = keyState;
     controller.right = keyState;
 
     if (event.type == "keydown") {
         keyState = true;
-        // console.log('keydown')
 
         if (event.keyCode === 37) {
             controller.left = keyState;
@@ -71,11 +63,10 @@ function keyListener(event) {
         }
     } else {
         keyState = false;
-        // console.log('keyup')
     }
 }
 
-function moveShip() {
+const moveShip = () => {
     if (controller.left) {
         ship.velX -= 1;
     }
@@ -157,6 +148,7 @@ const asteroids = [
     }
 ]
 
+// score counter
 let counter = 0
 
 // collision detection
@@ -166,8 +158,6 @@ const collisionDetection = (array, index) => {
         array[index].laneY + 25 < ship.shipY + spaceShip.height &&
         array[index].laneY + array[index].asteroidType.height - 25 > ship.shipY) {
         stopProgram = true;
-        // return
-        // alert('collision!')
     }
 }
 
@@ -241,7 +231,6 @@ const rogueAsteroidRight = (asteroid, Xmin, Xmax) => {
 }
 
 // background initial values
-
 const backgroundValues = {
     bgX: 0,
     bgY: 0,
@@ -249,10 +238,10 @@ const backgroundValues = {
     bgVelY: 0
 }
 
+// this function draws the canvas and loops through the game
 function draw() {
         
     // have two bg images scrolling one after the other
-    // console.log(backgroundValues.bgY)
     ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY);
     ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY2);
         if (backgroundValues.bgY > canvas.height) {
@@ -285,6 +274,7 @@ function draw() {
         rogueAsteroidLeft(0, -50, 650)
         rogueAsteroidRight(1, 650, 1050)
 
+        // the following statements increase the difficulty when the counter reaches a specific number
         if (counter === 50 && asteroids.length < 7) {
             asteroids.push({
                 asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
@@ -293,7 +283,6 @@ function draw() {
                 velocityY: 0,
                 randomVelocity: randomDecimal(0.75, 0.83)
             })
-            // console.log(asteroids.length)
         }
 
         if (counter === 100 && asteroids.length < 8) {
@@ -304,7 +293,6 @@ function draw() {
                 velocityY: 0,
                 randomVelocity: randomDecimal(0.75, 0.83)
             })
-            // console.log(asteroids.length)
         }
 
         if (counter === 150 && asteroids.length < 9) {
@@ -315,7 +303,6 @@ function draw() {
                 velocityY: 0,
                 randomVelocity: randomDecimal(0.75, 0.83)
             })
-            // console.log(asteroids.length)
         }
 
         if (counter === 200 && asteroids.length < 10) {
@@ -326,15 +313,13 @@ function draw() {
                 velocityY: 0,
                 randomVelocity: randomDecimal(0.75, 0.83)
             })
-            // console.log(asteroids.length)
         }
-    // need to create a win screen with odds of successfully navigating an asteroid field
 
         // -----------------------------------------------------
         
         ship.shipX += ship.velX;
         ship.shipY += ship.velY;
-        // add friction to make car slow down realistically
+        // make the ship gradually slow down
         ship.velX *= 0.9;
         ship.velY *= 0.9;
         
@@ -352,56 +337,53 @@ function draw() {
         showEndScreen()
         return
     }
-    
 }
 
+// these functions and variables deal with displaying the end screens
 let winScreenShown = false;
 let stopProgram = false;
+let showTitle = true;
 
 const showEndScreen = () => {
     endScreen.style.display = 'flex';
-    // finalScore.style.display = 'block';
     finalCount.innerHTML = counter;
 }
 
 const displayWinScreen = () => {
     endScreen.style.display = 'flex';
-    // finalScore.style.display = 'block';
     endTitle.style.fontSize = "24px";
     endTitle.style.padding = "0 60px";
     endTitle.innerHTML = 'You made it through! The odds of winning were 3,720 to 1!';
     finalCount.innerHTML = counter;
-
-    // console.log('show button')
 }
 
 
-let showTitle = true;
+
+/* =============================================== */
+/* Game starts here*/
+/* =============================================== */
+
 // wait for images to load before drawing
-// switch to promise
 spaceShip.onload = () => {
-    // draw();
     title.addEventListener('click', event => {
-        event.preventDefault();
-        title.style.display = 'none';
+        title.classList.add("fadeOut")
         scoreContainer.style.display = 'block';
         draw();
     })
     document.addEventListener('keypress', event => {
-        event.preventDefault();
         if (event.keyCode === 13 && showTitle === true) {
             showTitle = false;
-            title.style.display = 'none';
+            title.classList.add("fadeOut")
             scoreContainer.style.display = 'block';
             draw();
         }
     })
 }
 
+
+// these functions reload the game when end screens are shown
 playButton.addEventListener('click', event => {
-    event.preventDefault();
     location.reload();
-    // draw();
 })
 
 document.addEventListener('keypress', event => {
@@ -411,17 +393,8 @@ document.addEventListener('keypress', event => {
 })
 
 
-// cant use the same asteroid or it will conflict with the one already on screen
-        // the score will remain at 20 longer than expected, so the page will fill with asteroids
 
-
-// put key listeners in object to be able to press more than one key at a time
-// play with velocity
-// rotate car when turning
-// randomize cars
-// add more lanes
-// add timer (get to work on time)
-// touch screen functionality
+// *************** References ***************
 
 // http://atomicrobotdesign.com/blog/htmlcss/build-a-vertical-scrolling-shooter-game-with-html5-canvas-part-6/
     // scrolling bg
@@ -432,85 +405,3 @@ document.addEventListener('keypress', event => {
 // https://stackoverflow.com/questions/38420047/how-to-add-touch-screen-functionalitytap-left-right-side-of-screen-in-html5-mo
 
 
-// ********before refactor***********
-
-// let shipX = 450;
-// let shipY = canvas.height - 200;
-
-// let velX = 0;
-// let velY = 0;
-
-// let bgX = 0
-// let bgY = 0
-// let bgY2 = -1250
-// let bgVelY = 0
-
-// car.width = 94
-// canvas.width = 1000
-
-// asteroid widths 80 to 100
-
-// const renderAsteroid = (asteroid, Xmin, Xmax) => {
-//     // set asteroid's Y velocity and position
-//     // velocity is increased by 1 with every iteration, but by multiplying it with a number less than 1, it will get closer and closer to 0, thus slowing it down gradually
-//     // cant just change the Y position since it is redrawn everytime and the program will stutter. Using velocity allows smoother animation and makes it easier to randomize the asteroid velocity
-
-//     asteroids[asteroid].laneY += asteroids[asteroid].velocityY;
-//     asteroids[asteroid].velocityY++;
-//     asteroids[asteroid].velocityY *= asteroids[asteroid].randomVelocity;
-
-//     // collision detection
-
-//     if (asteroids[asteroid].laneX + 25 < shipX + spaceShip.width &&
-//         asteroids[asteroid].laneX + asteroids[asteroid].asteroidType.width - 25 > shipX &&
-//         asteroids[asteroid].laneY + 25 < shipY + spaceShip.height &&
-//         asteroids[asteroid].laneY + asteroids[asteroid].asteroidType.height - 15 > shipY) {
-//         alert('collision!')
-//     }
-
-//     // reset asteroid's position once it has passed the height of the canvas
- 
-//     if (asteroids[asteroid].laneY > canvas.height) {
-//         // increase score counter by 1
-//         counter += 1;
-//         score.innerHTML = counter;
-//         // asteroid's starting X position set to a random number
-//         // Y position reset and hard coded to have less overlap with other asteroids
-//         asteroids[asteroid].laneX = randomNumber(Xmin, Xmax);
-//         asteroids[asteroid].laneY = -asteroids[asteroid].asteroidType.height - 100
-//         // randomize asteroid type and velocity
-//         randomAsteroid = randomNumber(0, asteroidImages.length)
-//         asteroids[asteroid].asteroidType = asteroidImages[randomAsteroid]
-//         asteroids[asteroid].randomVelocity = randomDecimal(0.75, 0.83)
-//     }
-
-//     ctx.drawImage(asteroids[asteroid].asteroidType, asteroids[asteroid].laneX, asteroids[asteroid].laneY)
-// }
-
-// const rogueAsteroidLeft = (asteroid, Xmin, Xmax) => {
-//     rogueObjects[asteroid].laneY += rogueObjects[asteroid].velocityY;
-//     rogueObjects[asteroid].velocityY++;
-//     rogueObjects[asteroid].velocityY *= rogueObjects[asteroid].randomVelocity;
-
-//     rogueObjects[asteroid].laneX += 3
-
-//     if (rogueObjects[asteroid].laneX + 25 < shipX + spaceShip.width &&
-//         rogueObjects[asteroid].laneX + rogueObjects[asteroid].asteroidType.width - 25 > shipX &&
-//         rogueObjects[asteroid].laneY + 25 < shipY + spaceShip.height &&
-//         rogueObjects[asteroid].laneY + rogueObjects[asteroid].asteroidType.height - 15 > shipY) {
-//         alert('collision!')
-//     }
-
-//     if (rogueObjects[asteroid].laneY > canvas.height) {
-//         counter += 1;
-//         score.innerHTML = counter;
-//         rogueObjects[asteroid].laneX = randomNumber(Xmin, Xmax);
-//         rogueObjects[asteroid].laneY = -rogueObjects[asteroid].asteroidType.height - 100
-
-//         randomAsteroid = randomNumber(0, asteroidImages.length)
-//         rogueObjects[asteroid].asteroidType = asteroidImages[randomAsteroid]
-//         rogueObjects[asteroid].randomVelocity = randomDecimal(0.78, 0.9)
-//     }
-
-//     ctx.drawImage(rogueObjects[asteroid].asteroidType, rogueObjects[asteroid].laneX, rogueObjects[asteroid].laneY)
-// }
