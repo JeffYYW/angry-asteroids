@@ -332,6 +332,7 @@ function draw() {
     }
 
     if (stopProgram === false) {
+
         requestAnimationFrame(draw);
     } else {
         showEndScreen()
@@ -367,13 +368,15 @@ const displayWinScreen = () => {
 spaceShip.onload = () => {
     title.addEventListener('click', event => {
         title.classList.add("fadeOut")
+        title.style.pointerEvents = "none";
         scoreContainer.style.display = 'block';
         draw();
     })
     document.addEventListener('keypress', event => {
         if (event.keyCode === 13 && showTitle === true) {
             showTitle = false;
-            title.classList.add("fadeOut")
+            title.classList.add("fadeOut");
+            title.style.pointerEvents = "none";
             scoreContainer.style.display = 'block';
             draw();
         }
