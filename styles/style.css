@@ -217,7 +217,7 @@ h1, h2 {
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: rgba(50, 50, 50, 0.5);
+  background-image: url("./../assets/starfield.jpg");
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -230,6 +230,9 @@ h1, h2 {
 }
 
 .titleContainer {
+  padding: 0 20px;
+  padding-bottom: 40px;
+  text-align: center;
   color: #fff;
   font-family: 'Space Mono', monospace;
   width: 50%;
@@ -322,4 +325,10 @@ h1, h2 {
   color: #fff;
   text-transform: uppercase;
   font-size: 24px;
+}
+
+@media (max-width: 1020px) {
+  .titleContainer h1 {
+    font-size: 60px;
+  }
 }

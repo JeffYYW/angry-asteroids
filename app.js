@@ -5,6 +5,7 @@ const scoreContainer = document.querySelector('.scoreContainer');
 const endScreen = document.querySelector('.endScreen')
 const finalCount = document.getElementById('finalCount');
 const title = document.querySelector('.titleOverlay');
+const endTitle = document.querySelector('#endTitle');
 
 const cvs = document.getElementById('canvas');
 
@@ -60,7 +61,7 @@ function keyListener(event) {
 
     if (event.type == "keydown") {
         keyState = true;
-        console.log('keydown')
+        // console.log('keydown')
 
         if (event.keyCode === 37) {
             controller.left = keyState;
@@ -70,7 +71,7 @@ function keyListener(event) {
         }
     } else {
         keyState = false;
-        console.log('keyup')
+        // console.log('keyup')
     }
 }
 
@@ -251,7 +252,7 @@ const backgroundValues = {
 function draw() {
         
     // have two bg images scrolling one after the other
-    console.log(backgroundValues.bgY)
+    // console.log(backgroundValues.bgY)
     ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY);
     ctx.drawImage(bg, backgroundValues.bgX, backgroundValues.bgY2);
         if (backgroundValues.bgY > canvas.height) {
@@ -283,7 +284,52 @@ function draw() {
         // render rogue asteroids
         rogueAsteroidLeft(0, -50, 650)
         rogueAsteroidRight(1, 650, 1050)
-  
+
+        if (counter === 50 && asteroids.length < 7) {
+            asteroids.push({
+                asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+                laneX: randomNumber(20, 900),
+                laneY: -400,
+                velocityY: 0,
+                randomVelocity: randomDecimal(0.75, 0.83)
+            })
+            // console.log(asteroids.length)
+        }
+
+        if (counter === 100 && asteroids.length < 8) {
+            asteroids.push({
+                asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+                laneX: randomNumber(20, 900),
+                laneY: -450,
+                velocityY: 0,
+                randomVelocity: randomDecimal(0.75, 0.83)
+            })
+            // console.log(asteroids.length)
+        }
+
+        if (counter === 150 && asteroids.length < 9) {
+            asteroids.push({
+                asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+                laneX: randomNumber(20, 900),
+                laneY: -500,
+                velocityY: 0,
+                randomVelocity: randomDecimal(0.75, 0.83)
+            })
+            // console.log(asteroids.length)
+        }
+
+        if (counter === 200 && asteroids.length < 10) {
+            asteroids.push({
+                asteroidType: asteroidImages[randomNumber(0, asteroidImages.length)],
+                laneX: randomNumber(20, 900),
+                laneY: -550,
+                velocityY: 0,
+                randomVelocity: randomDecimal(0.75, 0.83)
+            })
+            // console.log(asteroids.length)
+        }
+    // need to create a win screen with odds of successfully navigating an asteroid field
+
         // -----------------------------------------------------
         
         ship.shipX += ship.velX;
@@ -294,23 +340,39 @@ function draw() {
         
     ctx.drawImage(spaceShip, ship.shipX, ship.shipY)
 
+    if (counter === 300) {
+        displayWinScreen()
+        winScreenShown = true;
+        return
+    }
+
     if (stopProgram === false) {
         requestAnimationFrame(draw);
     } else {
-        showButton()
+        showEndScreen()
         return
     }
     
 }
 
+let winScreenShown = false;
 let stopProgram = false;
 
-const showButton = () => {
+const showEndScreen = () => {
     endScreen.style.display = 'flex';
     // finalScore.style.display = 'block';
     finalCount.innerHTML = counter;
+}
 
-    console.log('show button')
+const displayWinScreen = () => {
+    endScreen.style.display = 'flex';
+    // finalScore.style.display = 'block';
+    endTitle.style.fontSize = "24px";
+    endTitle.style.padding = "0 60px";
+    endTitle.innerHTML = 'You made it through! The odds of winning were 3,720 to 1!';
+    finalCount.innerHTML = counter;
+
+    // console.log('show button')
 }
 
 
@@ -343,7 +405,7 @@ playButton.addEventListener('click', event => {
 })
 
 document.addEventListener('keypress', event => {
-    if (event.keyCode === 13 && stopProgram === true) {
+    if (event.keyCode === 13 && stopProgram === true || winScreenShown === true) {
         location.reload();
     }
 })
