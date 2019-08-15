@@ -5,13 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="styles/style.css">
-    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Space+Mono&display=swap" rel="stylesheet">
+    <title>Angry Asteroids</title>
 </head>
 <body>
         <div class="container">
+            <div class="titleOverlay">
+                <div class="titleContainer">
+                    <h1>Angry Asteroids</h1>
+                    <h2>Click or press 'Enter' to start</h2>
+                    <p>Use the left and right arrow keys to dodge the asteroids!</p>
+                </div>
+            </div>
             <canvas id="canvas"></canvas>
             <div class="scoreContainer">
-                <h1 id="scoreNumber">0</h1>
+                <h2 id="scoreNumber">0</h2>
+            </div>
+            <div class="endScreen">
+                <div class="finalScore">
+                    <h1>Asteroids Avoided</h1>
+                    <h2 id="finalCount"></h2>
+                </div>
+                <div class="controls">
+                    <button>Play Again</button>
+                </div>
             </div>
         </div>
 

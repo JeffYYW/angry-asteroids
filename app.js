@@ -1,5 +1,14 @@
+const container = document.querySelector('.container');
+const playButton = document.querySelector('.controls');
+// const finalScore = document.querySelector('.finalScore');
+const endScreen = document.querySelector('.endScreen')
+const finalCount = document.getElementById('finalCount');
+const title = document.querySelector('.titleOverlay');
+
 const cvs = document.getElementById('canvas');
+
 cvs.width = '1000';
+// cvs.height = '700';
 cvs.height = window.innerHeight;
 
 const ctx = cvs.getContext("2d");
@@ -153,8 +162,10 @@ const collisionDetection = (array, index) => {
     if (array[index].laneX + 25 < ship.shipX + spaceShip.width &&
         array[index].laneX + array[index].asteroidType.width - 25 > ship.shipX &&
         array[index].laneY + 25 < ship.shipY + spaceShip.height &&
-        array[index].laneY + array[index].asteroidType.height - 15 > ship.shipY) {
-        alert('collision!')
+        array[index].laneY + array[index].asteroidType.height - 25 > ship.shipY) {
+        stopProgram = true;
+        // return
+        // alert('collision!')
     }
 }
 
@@ -282,14 +293,57 @@ function draw() {
         
     ctx.drawImage(spaceShip, ship.shipX, ship.shipY)
 
-    requestAnimationFrame(draw);
+    if (stopProgram === false) {
+        requestAnimationFrame(draw);
+    } else {
+        showButton()
+        return
+    }
+    
 }
 
+let stopProgram = false;
+
+const showButton = () => {
+    endScreen.style.display = 'flex';
+    // finalScore.style.display = 'block';
+    finalCount.innerHTML = counter;
+
+    console.log('show button')
+}
+
+
+let showTitle = true;
 // wait for images to load before drawing
 // switch to promise
 spaceShip.onload = () => {
-    draw();
+    // draw();
+    title.addEventListener('click', event => {
+        event.preventDefault();
+        title.style.display = 'none';
+        draw();
+    })
+    document.addEventListener('keypress', event => {
+        event.preventDefault();
+        if (event.keyCode === 13 && showTitle === true) {
+            showTitle = false;
+            title.style.display = 'none';
+            draw();
+        }
+    })
 }
+
+playButton.addEventListener('click', event => {
+    event.preventDefault();
+    location.reload();
+    // draw();
+})
+
+document.addEventListener('keypress', event => {
+    if (event.keyCode === 13 && stopProgram === true) {
+        location.reload();
+    }
+})
 
 
 // cant use the same asteroid or it will conflict with the one already on screen
